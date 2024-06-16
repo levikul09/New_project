@@ -1,0 +1,106 @@
+Sub G_pattern()
+
+' Pattern for goal scorer
+Pattern = "(A\d{1,2}|H\d{1,2}) (G\d{1,2})"
+
+' Pattern if not empty goal - goalkeeper
+pattern1 = "(G\d{1,2}) (A\d{1,2}|H\d{1,2})"
+
+Set regex = CreateObject("VBScript.RegExp")
+
+'Pattern for goal
+regex.Pattern = Pattern
+regex.IgnoreCase = True
+regex.Global = True
+
+     If regex.Test(Selection.Value) Then
+    
+        Set matches = regex.Execute(Selection.Value)
+            MsgBox ("Goal scorer " & matches(0).SubMatches(0))
+            
+            
+            If matches(0).SubMatches(1) = "G8" Then
+                MsgBox ("Empty Goal")
+            Else
+         
+            ' Pattern if not empty goal
+            regex.Pattern = pattern1
+            regex.IgnoreCase = True
+            regex.Global = True
+            Set smatches = regex.Execute(Selection.Value)
+            MsgBox ("Goal keeper " & matches(0).SubMatches(1))
+        End If
+    Else
+        MsgBox ("no")
+    End If
+ End Sub
+Sub As_pattern()
+
+Pattern = "(A\d{1,2}|H\d{1,2}) (As\*?)"
+
+Set regex = CreateObject("VBScript.RegExp")
+regex.Pattern = Pattern
+regex.IgnoreCase = True
+regex.Global = True
+
+
+    If regex.Test(Selection.Value) Then
+        
+        Set matches = regex.Execute(Selection.Value)
+        player = matches(0).SubMatches(0)
+               
+        ' If player is from Away team
+            If Left(player, 1) = "A" Then
+            
+                Set ws = ThisWorkbook.Sheets("Away Team")
+                Set searchRange = ws.Columns("C")
+                searchString = player
+                searchString2 = "Assist"
+                
+                Set foundCell = searchRange.Find(What:=searchString, LookIn:=xlValues, LookAt:=xlWhole)
+                Set foundCell2 = searchRange2.Find(What:=searchString2, LookIn:=xlValues, LookAt:=xlWhole)
+                
+                If Not foundCell Is Nothing Then
+                
+                    foundrow = foundCell.Row
+                    foundcol = foundCell2.Column
+                    
+                    ws.Cells(foundrow, foundcol).Value = ws.Cells(foundrow, foundcol).Value + 1
+                    
+                Else
+                    MsgBox "String '" & searchString & "' not found in the specified range."
+                    
+                End If
+        ' If player is from Home team
+            Else
+                
+                Set ws = ThisWorkbook.Sheets("Home Team")
+                Set searchRange = ws.Columns("C")
+                Set searchRange2 = ws.Rows(2)
+                searchString = player
+                searchString2 = "Assist"
+                
+                Set foundCell = searchRange.Find(What:=searchString, LookIn:=xlValues, LookAt:=xlWhole)
+                Set foundCell2 = searchRange2.Find(What:=searchString2, LookIn:=xlValues, LookAt:=xlWhole)
+                    
+                If Not foundCell Is Nothing Then
+                
+                    foundrow = foundCell.Row
+                    foundcol = foundCell2.Column
+                    
+                    ws.Cells(foundrow, foundcol).Value = ws.Cells(foundrow, foundcol).Value + 1
+                
+                Else
+                    MsgBox "String '" & searchString & "' not found in the specified range."
+                End If
+                
+                    
+            End If
+    
+    Else
+       MsgBox ("Doesnt contain")
+    End If
+
+
+
+End Sub
